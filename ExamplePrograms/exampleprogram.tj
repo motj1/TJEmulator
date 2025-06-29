@@ -1,0 +1,45 @@
+@INPUTDATA = 0xFF00
+@CONTROL = 0xFF01
+@OUTPUTDATA = 0xFF02
+@OUTPUTDATA2 = 0xFF03
+@STATUS = 0xFF04
+
+    .data:
+message: .asciiz "Hello world\n"
+
+    .text:
+main:
+    # add r3 0 0
+    # addi r3 1
+
+    li r2 4
+    la r3 message
+    wb r3 OUTPUTDATA
+    wb r4 (OUTPUTDATA + 1)
+    wb r2 CONTROL
+
+    li r1 10
+
+    li r0 0
+loop__condition:
+    sub r2 r1 r0 # r2 = r1 - r0 and carry = (r0 > r1)
+    bc loop__end # branch if r0 > r1
+    bz r2 loop__end # branch if r0 = r1
+
+    li r6 1
+    wb r0 OUTPUTDATA
+    wb r6 CONTROL
+    # syscall # replace with setting 0xFFFD to val of r0 and 0xFFFF to 1
+
+    li r5 '\n'
+    li r6 11
+    wb r5 OUTPUTDATA
+    wb r6 CONTROL
+    # syscall # replace with setting 0xFFFD to val of 10 and 0xFFFF to 11
+
+    li r12 1
+    add r0, r0, r12
+    bz 0 loop__condition
+loop__end:
+
+    hlt
